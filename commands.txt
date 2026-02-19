@@ -1,0 +1,3 @@
+To run it entirely: python -m pipelines.full_pipeline --sources jsearch   
+Set api key for jsearch : export RAPIDAPI_KEY=your_key_here
+For search: python -m agent.searcher --query "senior kubernetes engineer remote" --top 5
