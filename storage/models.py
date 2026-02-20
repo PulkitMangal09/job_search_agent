@@ -118,13 +118,15 @@ class SkillTrend(Base):
 # ── Database Setup Utilities ──────────────────────────────────────────────────
 
 def get_engine(db_url: str = None):
-    """Create SQLAlchemy engine with connection pooling."""
-    url = db_url or DB.url
+    import os
+    # Check for Render's DATABASE_URL first
+    render_url = os.getenv("DATABASE_URL", "").replace("postgres://", "postgresql://", 1)
+    url = db_url or render_url or DB.url
     return create_engine(
         url,
-        pool_size=10,
-        max_overflow=20,
-        pool_pre_ping=True,    # Reconnect on stale connections
+        pool_size=5,
+        max_overflow=10,
+        pool_pre_ping=True,
         echo=False,
     )
 

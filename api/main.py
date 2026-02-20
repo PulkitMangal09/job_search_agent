@@ -20,6 +20,13 @@ from storage.postgres_store import PostgresStore
 
 logger = logging.getLogger(__name__)
 
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    # Render uses postgres:// but SQLAlchemy needs postgresql://
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+    from config.settings import DB
+    DB.url_override = database_url
+
 app = FastAPI(title="Job Intelligence Agent API", version="1.0.0")
 
 app.add_middleware(

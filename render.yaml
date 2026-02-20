@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: jobradar-api
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m spacy download en_core_web_sm
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: jobradar-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: jobradar-db
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: jobradar-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: jobradar-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: jobradar-db
+          property: password
+      - key: RAPIDAPI_KEY
+        sync: false   # You'll set this manually in Render dashboard
+
+databases:
+  - name: jobradar-db
+    databaseName: job_agent
+    user: postgres
+    plan: free
+```
+
+**Update `requirements.txt`** — add these if missing:
+```
+fastapi==0.110.0
+uvicorn==0.29.0
+python-multipart==0.0.9
