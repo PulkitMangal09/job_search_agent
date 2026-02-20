@@ -31,6 +31,9 @@ from scraping.base_scraper import RawJob
 from scraping.indeed_scraper import IndeedScraper
 from scraping.linkedin_scraper import LinkedInScraper
 from scraping.jsearch_scraper import JSearchScraper
+from scraping.greenhouse_scraper import GreenhouseScraper
+from scraping.lever_scraper import LeverScraper
+from scraping.workday_scraper import WorkdayScraper
 
 from cleaning.cleaner import JobCleaner, CleanJob
 from nlp.skill_extractor import SkillExtractor
@@ -116,6 +119,14 @@ class JobPipeline:
 
     def _build_scrapers(self):
         """Instantiate scrapers for all configured sources."""
+        # Keywords used by ATS scrapers to filter relevant jobs
+        devops_aiml_keywords = [
+            "devops", "mlops", "machine learning", "deep learning",
+            "kubernetes", "platform engineer", "site reliability",
+            "data scientist", "ml engineer", "ai engineer",
+            "infrastructure", "cloud engineer", "nlp", "llm",
+        ]
+
         scrapers = []
         if "indeed" in self.sources:
             scrapers.append(IndeedScraper(ALL_SEARCH_TERMS, self.location))
@@ -123,6 +134,12 @@ class JobPipeline:
             scrapers.append(LinkedInScraper(ALL_SEARCH_TERMS, self.location))
         if "jsearch" in self.sources:
             scrapers.append(JSearchScraper(ALL_SEARCH_TERMS, self.location))
+        if "greenhouse" in self.sources:
+            scrapers.append(GreenhouseScraper(keywords=devops_aiml_keywords))
+        if "lever" in self.sources:
+            scrapers.append(LeverScraper(keywords=devops_aiml_keywords))
+        if "workday" in self.sources:
+            scrapers.append(WorkdayScraper(keywords=devops_aiml_keywords))
         return scrapers
 
     # ── Stage 2: Cleaning ─────────────────────────────────────────────────────
@@ -323,8 +340,8 @@ class JobPipeline:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the Job Intelligence Pipeline")
     parser.add_argument(
-        "--sources", nargs="+", default=["jsearch"],
-        choices=["indeed", "linkedin", "jsearch"],
+        "--sources", nargs="+", default=["greenhouse", "lever"],
+        choices=["indeed", "linkedin", "jsearch", "greenhouse", "lever", "workday"],
         help="Job sources to scrape",
     )
     parser.add_argument("--location", default="United States")
