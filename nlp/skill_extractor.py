@@ -185,20 +185,27 @@ class SkillExtractor:
         """
         Extract the explicitly required years of experience, if stated.
         Returns the minimum mentioned, or None if not found.
-        
-        Examples:
-          "5+ years of experience"     → 5
-          "3-5 years experience"       → 3
-          "minimum 2 years required"   → 2
         """
-        pattern = re.compile(
-            r"(\d+)\+?\s*(?:-\s*\d+)?\s*years?\s*(?:of\s*)?(?:experience|exp)",
-            re.IGNORECASE
-        )
-        matches = pattern.findall(text)
-        if matches:
-            return min(int(m) for m in matches)
+
+        if not text:
+            return None
+
+        text = text.lower()
+
+        # 1️Handle ranges like 3-7 years or 3–7 years
+        range_pattern = re.compile(r"(\d+)\s*[-–]\s*(\d+)\s+years?")
+        range_match = range_pattern.search(text)
+        if range_match:
+            return int(range_match.group(1))  # return minimum
+
+        # 2 Handle single values like 5+ years, 2 years, etc.
+        single_pattern = re.compile(r"(\d+)\+?\s+years?")
+        single_match = single_pattern.search(text)
+        if single_match:
+            return int(single_match.group(1))
+
         return None
+
 
 
 # ── Optional: Import guard for Optional type hint ─────────────────────────────
