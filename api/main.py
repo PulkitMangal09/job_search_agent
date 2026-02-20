@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
-
+import os
 from agent.searcher import JobSearcher
 from agent.recommender import JobRecommender, UserProfile
 from agent.insights import InsightsEngine
